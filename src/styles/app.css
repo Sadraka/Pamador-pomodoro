@@ -1,0 +1,383 @@
+/* ---------- app frame ---------- */
+.app {
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden; /* never scrolls, at any window size */
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-xl) var(--space-md);
+  max-width: 60rem;
+  margin-inline: auto;
+}
+
+.app__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.app__head-actions {
+  display: flex;
+  gap: var(--space-xs);
+}
+
+.app__wordmark {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: var(--text-md);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.app__mark {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--color-accent);
+}
+
+.app__body {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: var(--space-md);
+  min-height: 0; /* grid child must be allowed to shrink */
+  overflow: hidden; /* overflow can never overlap the header — root-cause fix */
+}
+
+/* ---------- mode tabs (indicators, not controls) ---------- */
+.mode-tabs {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-sm);
+}
+
+.mode-tab {
+  position: relative;
+  height: 2.75rem;
+  padding: var(--space-xs) var(--space-sm);
+  border: none;
+  background: none;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-neutral);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  .mode-tab:hover {
+    color: var(--color-ink);
+  }
+}
+
+.mode-tab--active {
+  color: var(--color-ink);
+}
+
+.mode-tab--active::after {
+  content: '';
+  position: absolute;
+  inset-inline: var(--space-2xs);
+  bottom: var(--space-2xs);
+  height: 2px;
+  border-radius: 1px;
+  background: var(--color-accent);
+}
+
+/* ---------- timer ring ---------- */
+.ring {
+  position: relative;
+  width: min(72vw, 52vh, 24rem);
+  aspect-ratio: 1;
+}
+
+/* dial open (idle focus): smaller ring so dial + controls fit the 480px min-height */
+.ring--dial {
+  container-type: inline-size; /* lets .ring__time size itself off the ring */
+  width: min(56vw, 30vh, 15rem);
+}
+
+/* time text scales with the ring, not the viewport — never overflows the circle */
+.ring--dial .ring__time {
+  font-size: clamp(1.5rem, 24cqw, 3rem);
+}
+
+.ring__svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.ring__track {
+  fill: none;
+  stroke: var(--color-paper-3);
+  stroke-width: 8;
+}
+
+.ring__progress {
+  fill: none;
+  stroke: var(--color-accent);
+  stroke-width: 8;
+  stroke-linecap: round;
+  transition: stroke-dashoffset var(--dur-tick) linear; /* progress bar — linear allowed */
+}
+
+.ring__progress--paused {
+  stroke: var(--color-neutral);
+}
+
+.ring__inner {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: var(--space-xs);
+}
+
+.ring__mode {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-muted);
+}
+
+.ring__time {
+  font-family: var(--font-display);
+  font-size: var(--text-timer);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--color-ink);
+}
+
+.ring__time--paused {
+  color: var(--color-neutral);
+}
+
+/* ---------- controls ---------- */
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-md);
+}
+
+.btn {
+  height: 2.75rem; /* 44px hit target floor */
+  padding-inline: var(--space-lg);
+  border: 1px solid var(--color-rule-2);
+  border-radius: var(--radius-md);
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color var(--dur-short) var(--ease-out),
+    border-color var(--dur-short) var(--ease-out),
+    transform var(--dur-micro) var(--ease-out);
+}
+
+@media (hover: hover) {
+  .btn:hover {
+    background: var(--color-paper-2);
+  }
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn:disabled,
+.btn[aria-disabled='true'] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn--primary {
+  border-color: var(--color-ink);
+  background: var(--color-ink);
+  color: var(--color-paper);
+}
+
+@media (hover: hover) {
+  .btn--primary:hover {
+    border-color: var(--color-ink-2);
+    background: var(--color-ink-2);
+  }
+}
+
+.btn--ghost {
+  border-color: transparent;
+  background: transparent;
+}
+
+@media (hover: hover) {
+  .btn--ghost:hover {
+    background: var(--color-paper-2);
+  }
+}
+
+/* 8-state completeness: loading / error / success (used by the settings modal next step) */
+.btn[data-state='loading'] {
+  pointer-events: none;
+  opacity: 0.8;
+}
+
+.btn[data-state='loading']::before {
+  content: '';
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  margin-inline-end: var(--space-xs);
+  vertical-align: -0.2em;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: var(--radius-full);
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.btn[data-state='error'] {
+  border-color: var(--color-error);
+  color: var(--color-error);
+}
+
+.btn[data-state='success'] {
+  border-color: var(--color-success);
+  color: var(--color-success);
+}
+
+/* ---------- focus duration dial ---------- */
+.focus-dial {
+  display: grid;
+  place-items: center;
+  gap: var(--space-md);
+  min-height: 0;
+}
+
+.dial {
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  align-items: center;
+  gap: var(--space-lg);
+}
+
+.dial__row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.dial__label {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-muted);
+  white-space: nowrap;
+}
+
+.stepper {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--color-rule-2);
+  border-radius: var(--radius-md);
+  overflow: hidden; /* square siblings — no inner radii */
+}
+
+.step {
+  width: 2.75rem;
+  height: 2.75rem;
+  border: none;
+  background: transparent;
+  color: var(--color-muted);
+  font-family: var(--font-body);
+  font-size: var(--text-md);
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background-color var(--dur-short) var(--ease-out),
+    color var(--dur-short) var(--ease-out);
+}
+
+@media (hover: hover) {
+  .step:hover {
+    background: var(--color-paper-2);
+    color: var(--color-ink);
+  }
+}
+
+.step:active {
+  transform: translateY(1px);
+}
+
+.dial__value {
+  min-width: 3.75rem;
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: var(--text-md);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-ink);
+}
+
+.chips--presets {
+  display: grid;
+  grid-template-columns: repeat(6, 2.5rem);
+  gap: var(--space-2xs);
+}
+
+.chip {
+  height: 2rem;
+  padding-inline: 0;
+  border: 1px solid var(--color-rule);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-neutral);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    border-color var(--dur-short) var(--ease-out),
+    color var(--dur-short) var(--ease-out);
+}
+
+@media (hover: hover) {
+  .chip:hover {
+    border-color: var(--color-rule-2);
+    color: var(--color-ink);
+  }
+}
+
+.chip:active {
+  transform: translateY(1px);
+}
+
+.chip--active {
+  border-color: var(--color-accent);
+  color: var(--color-ink);
+}
+
+/* ---------- reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 150ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 150ms !important;
+  }
+}

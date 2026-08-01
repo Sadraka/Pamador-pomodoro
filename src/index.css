@@ -1,11 +1,33 @@
 @import './styles/fonts.css';
+@import '../tokens.css';
+@import './styles/app.css';
 
 :root {
-  font-family: 'Vazirmatn', system-ui, sans-serif;
-  color-scheme: light dark;
+  color-scheme: dark;
+  font-family: var(--font-body);
+  font-weight: 350; /* dark recipe: drop body weight ~50 units */
+}
+
+html {
+  overflow: hidden; /* the app never scrolls — no axis, no window size */
 }
 
 body {
+  overflow: hidden;
+  overscroll-behavior: none; /* no bounce/glow on Windows touch */
   margin: 0;
-  min-height: 100vh;
+  height: 100vh;
+  background: var(--color-paper);
+  color: var(--color-ink);
+}
+
+#root {
+  height: 100vh;
+  height: 100dvh;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+  border-radius: inherit;
 }

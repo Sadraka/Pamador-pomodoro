@@ -7,11 +7,12 @@ import {
   type ReactNode,
 } from 'react';
 import { messages, type Lang, type TKey } from './messages';
+import { toFaDigits } from '../utils/format';
 
 interface I18n {
   lang: Lang;
   setLang: (lang: Lang) => void;
-  t: (key: TKey) => string;
+  t: (key: TKey, vars?: Record<string, string | number>) => string;
   dir: 'rtl' | 'ltr';
 }
 
@@ -33,7 +34,18 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     document.documentElement.lang = lang;
   }, [dir, lang]);
 
-  const t = useCallback((key: TKey) => messages[lang][key], [lang]);
+  const t = useCallback(
+    (key: TKey, vars?: Record<string, string | number>) => {
+      const s = messages[lang][key];
+      if (!vars) return s;
+      return s.replace(/\{(\w+)\}/g, (_, k: string) => {
+        const v = vars[k];
+        if (v === undefined) return `{${k}}`;
+        return lang === 'fa' ? toFaDigits(v) : String(v);
+      });
+    },
+    [lang],
+  );
 
   return <Ctx.Provider value={{ lang, setLang, t, dir }}>{children}</Ctx.Provider>;
 }

@@ -25,6 +25,7 @@ fn spawn_ticker(app: tauri::AppHandle, state: timer::SharedState) {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_dialog::init())
         .setup(|app| {
             if cfg!(debug_assertions) {
                 app.handle().plugin(
@@ -44,6 +45,7 @@ pub fn run() {
             timer::pause_timer,
             timer::reset_timer,
             timer::skip_timer,
+            timer::set_mode,
             timer::update_settings
         ])
         .run(tauri::generate_context!())

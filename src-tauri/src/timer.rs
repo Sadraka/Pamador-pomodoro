@@ -4,7 +4,7 @@ use std::time::{Duration, Instant};
 use serde::{Deserialize, Serialize};
 use tauri::State;
 
-#[derive(Clone, Copy, Debug, PartialEq, Serialize)]
+#[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum Mode {
     Focus,
@@ -164,6 +164,15 @@ impl TimerState {
         self.snapshot()
     }
 
+    /// Manual mode switch (clicking a mode tab): stops the current session.
+    pub fn set_mode(&mut self, mode: Mode) -> Snapshot {
+        self.mode = mode;
+        self.deadline = None;
+        self.status = Status::Idle;
+        self.remaining_secs = self.duration_for(mode);
+        self.snapshot()
+    }
+
     pub fn update_settings(&mut self, settings: Settings) -> Snapshot {
         let was_running = self.is_running();
         self.settings = settings;
@@ -222,6 +231,11 @@ pub fn reset_timer(state: State<'_, SharedState>) -> Snapshot {
 #[tauri::command]
 pub fn skip_timer(state: State<'_, SharedState>) -> Snapshot {
     state.lock().unwrap().skip()
+}
+
+#[tauri::command]
+pub fn set_mode(state: State<'_, SharedState>, mode: Mode) -> Snapshot {
+    state.lock().unwrap().set_mode(mode)
 }
 
 #[tauri::command]
@@ -303,6 +317,18 @@ mod tests {
         assert_eq!(f.mode, Mode::Focus);
         assert_eq!(t.snapshot().mode, Mode::LongBreak);
         assert_eq!(t.snapshot().focus_count, 4);
+    }
+
+    #[test]
+    fn set_mode_switches_and_stops() {
+        let mut t = TimerState::default();
+        t.start();
+        let s = t.set_mode(Mode::LongBreak);
+        assert_eq!(s.mode, Mode::LongBreak);
+        assert_eq!(s.status, Status::Idle);
+        assert_eq!(s.remaining_secs, 15 * 60);
+        assert!(!t.is_running());
+        assert_eq!(t.set_mode(Mode::Focus).remaining_secs, 25 * 60);
     }
 
     #[test]

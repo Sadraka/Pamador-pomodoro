@@ -1,0 +1,23 @@
+[
+  {
+    "date": "2026-08-01",
+    "macrostructure": "app-scope (timer screen)",
+    "theme": "Garden (dark)",
+    "enrichment": "none",
+    "brief": "Pomodoro — focus-duration dial on the idle Focus timer (min/sec steppers + presets), settings removed, no-scroll hardened"
+  },
+  {
+    "date": "2026-08-01",
+    "macrostructure": "app-scope (timer screen)",
+    "theme": "Garden (dark)",
+    "enrichment": "none",
+    "brief": "Pomodoro — dark redesign pass: Garden dark palette, minimal tabs, no-scroll sizing"
+  },
+  {
+    "date": "2026-08-01",
+    "macrostructure": "app-scope (timer screen)",
+    "theme": "Garden",
+    "enrichment": "none",
+    "brief": "Pomodoro desktop timer UI (Rust engine + React)"
+  }
+]

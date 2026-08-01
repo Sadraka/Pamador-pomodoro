@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { invoke } from '@tauri-apps/api/core';
 import { listen } from '@tauri-apps/api/event';
-import type { Finished, Settings, Snapshot } from '../types/timer';
+import type { Finished, Mode, Settings, Snapshot } from '../types/timer';
 
 const TIMER_EVENT = 'timer';
 const FINISHED_EVENT = 'timer-finished';
@@ -36,6 +36,7 @@ export function usePomodoro() {
   const pause = useCallback(() => run('pause_timer'), [run]);
   const reset = useCallback(() => run('reset_timer'), [run]);
   const skip = useCallback(() => run('skip_timer'), [run]);
+  const setMode = useCallback((mode: Mode) => run('set_mode', { mode }), [run]);
   const updateSettings = useCallback(
     (settings: Settings) => run('update_settings', { settings }),
     [run],
@@ -49,6 +50,7 @@ export function usePomodoro() {
     pause,
     reset,
     skip,
+    setMode,
     updateSettings,
   };
 }
