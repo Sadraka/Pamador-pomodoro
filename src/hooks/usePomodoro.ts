@@ -14,14 +14,7 @@ export function usePomodoro() {
     let disposed = false;
 
     if ('__TAURI_INTERNALS__' in window) {
-      import('@tauri-apps/api/window').then(async (mod) => {
-        const mainWin = mod.getCurrentWindow();
-        await mainWin.show();
-        const splashWin = await mod.Window.getByLabel('splashscreen');
-        if (splashWin) {
-          await splashWin.close();
-        }
-      }).catch(console.error);
+      invoke('close_splashscreen').catch(console.error);
     }
 
     invoke<Snapshot>('get_state')
