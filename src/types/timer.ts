@@ -8,6 +8,7 @@ export interface Settings {
   shortBreakSecs: number;
   longBreakSecs: number;
   soundPath: string | null;
+  raiseOnFinish: boolean;
 }
 
 export interface Snapshot {
@@ -21,4 +22,5 @@ export interface Snapshot {
 export interface Finished {
   mode: Mode;
   soundPath: string | null;
+  raiseOnFinish: boolean;
 }

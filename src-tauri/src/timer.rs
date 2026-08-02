@@ -28,6 +28,8 @@ pub struct Settings {
     pub long_break_secs: u64,
     /// None = default bundled alarm; Some(path) = user-chosen .mp3/.wav
     pub sound_path: Option<String>,
+    /// When true, restore/raise the window when the timer finishes.
+    pub raise_on_finish: bool,
 }
 
 impl Default for Settings {
@@ -37,6 +39,7 @@ impl Default for Settings {
             short_break_secs: 5 * 60,
             long_break_secs: 15 * 60,
             sound_path: None,
+            raise_on_finish: true,
         }
     }
 }
@@ -57,6 +60,7 @@ pub struct Snapshot {
 pub struct Finished {
     pub mode: Mode,
     pub sound_path: Option<String>,
+    pub raise_on_finish: bool,
 }
 
 pub struct TimerState {
@@ -136,6 +140,8 @@ impl TimerState {
         if !self.is_running() {
             self.deadline = Some(Instant::now() + Duration::from_secs(self.remaining_secs));
             self.status = Status::Running;
+            // Update remaining immediately so the display counts down right away.
+            self.remaining_secs = self.remaining_until(Instant::now());
         }
         self.snapshot()
     }
@@ -197,6 +203,7 @@ impl TimerState {
         let finished = Finished {
             mode: self.mode,
             sound_path: self.settings.sound_path.clone(),
+            raise_on_finish: self.settings.raise_on_finish,
         };
         self.advance();
         self.deadline = None;
@@ -253,6 +260,7 @@ mod tests {
             short_break_secs: 2,
             long_break_secs: 2,
             sound_path: Some("C:/alarm.mp3".into()),
+            raise_on_finish: true,
         }
     }
 
@@ -342,6 +350,7 @@ mod tests {
             short_break_secs: 2,
             long_break_secs: 2,
             sound_path: None,
+            raise_on_finish: false,
         });
         assert_eq!(s.status, Status::Running);
         assert_eq!(s.remaining_secs, 3); // old session untouched

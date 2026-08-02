@@ -1,11 +1,11 @@
-/* Hallmark · genre: editorial · scope: app-screen (macrostructure/nav/footer skipped) · theme: Garden (dark)
- * axes: paper=dark (L 15) · display=roman sans (Vazirmatn — single-font app requirement) · accent=leaf-green (L 60, C 0.11, H 152)
- * dark recipe: paper L15 not #000 · ink L94 not #fff · accent chroma -0.02, lightness +10 · elevation by lightness · hue fixed 152
- * enrichment: none (typography + data ring) · motion: micro (button press, ring progress, tab underline)
+/* Hallmark · genre: modern-minimal · macrostructure: Focused Timer
+ * theme: Custom (Garden dark + glass) · enrichment: none
+ * axes: paper=dark (L 15) · display=Vazirmatn (single-font Persian) · accent=leaf-green (L 60, C 0.11, H 152)
+ * glass recipe: purposeful depth layers · not decorative
  * pre-emit critique: P5 H4 E5 S4 R5 V5
  */
 :root {
-  /* colour — Garden dark: deep green-tinted paper, light ink, leaf accent */
+  /* ─── colour — Garden dark: deep green-tinted paper, light ink, leaf accent ─── */
   --color-paper: oklch(15% 0.01 152);
   --color-paper-2: oklch(19% 0.012 152);
   --color-paper-3: oklch(24% 0.014 152);
@@ -16,13 +16,30 @@
   --color-ink: oklch(94% 0.006 152);
   --color-ink-2: oklch(86% 0.008 152);
   --color-accent: oklch(60% 0.11 152);
+  --color-accent-dim: oklch(60% 0.11 152 / 0.2);
+  --color-accent-hover: oklch(60% 0.11 152 / 0.3);
+  --color-accent-border: oklch(60% 0.11 152 / 0.4);
   --color-accent-ink: oklch(15% 0.01 152);
   --color-focus: oklch(66% 0.12 152);
   --color-error: oklch(66% 0.19 25);
   --color-success: oklch(64% 0.11 152);
-  --color-backdrop: oklch(10% 0.01 152 / 0.55); /* modal overlay — alpha as modifier, allowed */
+  --color-backdrop: oklch(10% 0.01 152 / 0.55);
 
-  /* type — Vazirmatn variable, local woff2; single-font app by requirement */
+  /* ─── glass — visible depth layers on dark canvas ─── */
+  --glass-bg: oklch(100% 0 0 / 0.07);
+  --glass-bg-hover: oklch(100% 0 0 / 0.11);
+  --glass-bg-active: oklch(100% 0 0 / 0.14);
+  --glass-border: oklch(100% 0 0 / 0.12);
+  --glass-border-hover: oklch(100% 0 0 / 0.18);
+  --glass-blur: 20px;
+  --glass-track: oklch(100% 0 0 / 0.08);
+  --glass-inner: oklch(100% 0 0 / 0.05);
+
+  /* ─── canvas — visible ambient tints ─── */
+  --canvas-bloom-1: oklch(60% 0.11 152 / 0.10);
+  --canvas-bloom-2: oklch(55% 0.08 152 / 0.06);
+
+  /* ─── type — Vazirmatn variable, single-font by design ─── */
   --font-display: 'Vazirmatn', system-ui, sans-serif;
   --font-body: 'Vazirmatn', system-ui, sans-serif;
   --text-xs: 0.64rem;
@@ -31,7 +48,7 @@
   --text-md: 1.25rem;
   --text-timer: clamp(3rem, 10vw, 5rem);
 
-  /* space — 4pt scale */
+  /* ─── space — 4pt scale ─── */
   --space-3xs: 0.125rem;
   --space-2xs: 0.25rem;
   --space-xs: 0.5rem;
@@ -42,18 +59,19 @@
   --space-2xl: 4rem;
   --space-3xl: 6rem;
 
-  /* motion — canon eases + durations (no bounce, no `ease`) */
+  /* ─── motion — Hallmark canon, no spring, no bounce ─── */
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
   --dur-micro: 120ms;
   --dur-short: 220ms;
   --dur-long: 420ms;
-  --dur-tick: 1s; /* ring progress — functional, linear is allowed */
+  --dur-tick: 1s;
 
-  /* misc */
+  /* ─── misc ─── */
   --radius-sm: 6px;
   --radius-md: 10px;
+  --radius-lg: 16px;
   --radius-full: 999px;
   --z-base: 1;
   --z-modal: 400;

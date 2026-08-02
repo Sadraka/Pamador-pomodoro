@@ -17,7 +17,16 @@ fn spawn_ticker(app: tauri::AppHandle, state: timer::SharedState) {
             let _ = app.emit("timer", snapshot);
         }
         if let Some(f) = finished {
+            let should_raise = f.raise_on_finish;
             let _ = app.emit("timer-finished", f);
+            // Restore/raise the window when the timer finishes.
+            if should_raise {
+                if let Some(window) = app.get_webview_window("main") {
+                    let _ = window.unminimize();
+                    let _ = window.show();
+                    let _ = window.set_focus();
+                }
+            }
         }
     });
 }
@@ -34,6 +43,7 @@ pub fn run() {
                         .build(),
                 )?;
             }
+
             let state: timer::SharedState = Arc::new(Mutex::new(timer::TimerState::default()));
             app.manage(state.clone());
             spawn_ticker(app.handle().clone(), state);

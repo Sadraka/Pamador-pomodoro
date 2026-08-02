@@ -1,6 +1,6 @@
 export const messages = {
   fa: {
-    appName: 'پومودورو',
+    appName: 'پامادور',
     focus: 'تمرکز',
     shortBreak: 'استراحت کوتاه',
     longBreak: 'استراحت بلند',
@@ -24,9 +24,14 @@ export const messages = {
     cancel: 'انصراف',
     minutesHint: 'بین ۱ تا ۱۸۰ دقیقه',
     audioFiles: 'فایل صوتی',
+    soundSettings: 'تنظیمات صدا',
+    customSound: 'صدای سفارشی',
+    close: 'بستن',
+    customize: 'تنظیم',
+    raiseOnFinish: 'بازگرداندن پنجره پس از پایان',
   },
   en: {
-    appName: 'Pomodoro',
+    appName: 'Pamador',
     focus: 'Focus',
     shortBreak: 'Short Break',
     longBreak: 'Long Break',
@@ -50,6 +55,11 @@ export const messages = {
     cancel: 'Cancel',
     minutesHint: 'Between 1 and 180 minutes',
     audioFiles: 'Audio files',
+    soundSettings: 'Sound settings',
+    customSound: 'Custom sound',
+    close: 'Close',
+    customize: 'Customize',
+    raiseOnFinish: 'Raise window when finished',
   },
 } as const;
 
