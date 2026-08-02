@@ -103,6 +103,55 @@
   overflow: hidden;
 }
 
+/* ---------- responsive — keep elements aligned when resizing ---------- */
+/* Short windows: the ring's clamp() already tracks vmin, so it shrinks
+   automatically. Ensure the body never overflows the window — center what
+   fits, and let it scroll only when there is genuinely no room. */
+.app__body {
+  align-content: center;
+}
+
+@media (max-height: 600px) {
+  .app {
+    gap: clamp(0.5rem, 2vw, 0.75rem);
+  }
+
+  /* ring already uses vmin, so it stays proportional; just cap it smaller */
+  .ring {
+    width: min(40vmin, 18rem);
+  }
+}
+
+@media (max-height: 520px) {
+  .app__body {
+    align-content: start;
+    overflow-y: auto;
+  }
+}
+
+/* Narrow windows: shrink the content ceiling and paddings so nothing
+   clips, overlaps, or wraps awkwardly. */
+@media (max-width: 460px) {
+  .app {
+    max-width: 24rem;
+    padding-inline: clamp(0.5rem, 2vw, 0.75rem);
+    gap: clamp(0.5rem, 2vw, 0.75rem);
+  }
+
+  .chips--presets {
+    grid-template-columns: repeat(4, minmax(2.25rem, 1fr));
+  }
+
+  .dial__row {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .controls .btn {
+    padding-inline: clamp(0.6rem, 2vw, 0.9rem);
+  }
+}
+
 /* ---------- mode tabs — glass pill communicates grouped controls ---------- */
 .mode-tabs {
   display: flex;
