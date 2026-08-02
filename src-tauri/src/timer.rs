@@ -1,3 +1,4 @@
+use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
@@ -63,6 +64,9 @@ pub struct Finished {
     pub raise_on_finish: bool,
 }
 
+/// File name used to persist settings under the app data dir.
+const SETTINGS_FILE: &str = "settings.json";
+
 pub struct TimerState {
     mode: Mode,
     status: Status,
@@ -70,6 +74,37 @@ pub struct TimerState {
     deadline: Option<Instant>,
     focus_count: u64,
     settings: Settings,
+    /// Where to persist settings (`None` = in-memory only, e.g. tests).
+    save_path: Option<PathBuf>,
+}
+
+impl TimerState {
+    /// Create a fresh state with defaults, attempting to load persisted settings
+    /// from `app_data_dir/settings.json` if it exists.
+    pub fn new_with_save_dir(app_data_dir: Option<&Path>) -> Self {
+        let mut state = Self::default();
+        if let Some(dir) = app_data_dir {
+            let path = dir.join(SETTINGS_FILE);
+            if path.exists() {
+                if let Ok(json) = std::fs::read_to_string(&path) {
+                    if let Ok(loaded) = serde_json::from_str::<Settings>(&json) {
+                        state.settings = loaded;
+                        state.remaining_secs = state.duration_for(state.mode);
+                    }
+                }
+            }
+            state.save_path = Some(path);
+        }
+        state
+    }
+
+    /// Persist settings to disk (silent failure: persistence is best-effort).
+    fn save_settings(&self) {
+        if let Some(path) = &self.save_path {
+            let json = serde_json::to_string_pretty(&self.settings).unwrap_or_default();
+            let _ = std::fs::write(path, json);
+        }
+    }
 }
 
 impl Default for TimerState {
@@ -82,6 +117,7 @@ impl Default for TimerState {
             deadline: None,
             focus_count: 0,
             settings,
+            save_path: None,
         }
     }
 }
@@ -182,6 +218,7 @@ impl TimerState {
     pub fn update_settings(&mut self, settings: Settings) -> Snapshot {
         let was_running = self.is_running();
         self.settings = settings;
+        self.save_settings();
         if !was_running {
             self.remaining_secs = self.duration_for(self.mode);
         }
@@ -337,6 +374,45 @@ mod tests {
         assert_eq!(s.remaining_secs, 15 * 60);
         assert!(!t.is_running());
         assert_eq!(t.set_mode(Mode::Focus).remaining_secs, 25 * 60);
+    }
+
+    #[test]
+    fn settings_persist_across_reload() {
+        use std::sync::atomic::{AtomicU64, Ordering};
+        static COUNTER: AtomicU64 = AtomicU64::new(0);
+        let n = COUNTER.fetch_add(1, Ordering::Relaxed);
+        let dir = std::env::temp_dir().join(format!("pamador-test-{}", n));
+        std::fs::create_dir_all(&dir).unwrap();
+        let dir_path = dir.clone();
+
+        // First load: defaults.
+        let mut t = TimerState::new_with_save_dir(Some(&dir));
+        assert_eq!(t.snapshot().settings.focus_secs, 25 * 60);
+
+        // Change a setting and persist it.
+        let s = Settings {
+            focus_secs: 42 * 60,
+            short_break_secs: 7 * 60,
+            long_break_secs: 20 * 60,
+            sound_path: Some("C:/custom.mp3".into()),
+            raise_on_finish: false,
+        };
+        t.update_settings(s);
+
+        // New instance reads the persisted settings back.
+        let t2 = TimerState::new_with_save_dir(Some(&dir_path));
+        assert_eq!(t2.snapshot().settings.focus_secs, 42 * 60);
+        assert_eq!(t2.snapshot().settings.short_break_secs, 7 * 60);
+        assert_eq!(t2.snapshot().settings.long_break_secs, 20 * 60);
+        assert_eq!(
+            t2.snapshot().settings.sound_path.as_deref(),
+            Some("C:/custom.mp3")
+        );
+        assert!(!t2.snapshot().settings.raise_on_finish);
+        // Remaining seconds follow the persisted duration.
+        assert_eq!(t2.snapshot().remaining_secs, 42 * 60);
+
+        std::fs::remove_dir_all(&dir).ok();
     }
 
     #[test]

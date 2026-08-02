@@ -55,7 +55,10 @@ pub fn run() {
                 )?;
             }
 
-            let state: timer::SharedState = Arc::new(Mutex::new(timer::TimerState::default()));
+            // Settings live in <app_data_dir>/settings.json so choices survive restarts.
+            let app_data_dir = app.path().app_data_dir().ok();
+            let state: timer::SharedState =
+                Arc::new(Mutex::new(timer::TimerState::new_with_save_dir(app_data_dir.as_deref())));
             app.manage(state.clone());
             spawn_ticker(app.handle().clone(), state);
             Ok(())
