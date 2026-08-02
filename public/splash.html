@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8" />
+  <style>
+    * {
+      box-sizing: border-box;
+      user-select: none;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: #161e18;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      overflow: hidden;
+      color: #e5ebe6;
+    }
+    .tomato-icon {
+      width: 80px;
+      height: 80px;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 0.85; }
+      50% { transform: scale(1.1); opacity: 1; }
+    }
+    .title {
+      margin-top: 16px;
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      color: #9cb896;
+    }
+  </style>
+</head>
+<body>
+  <svg class="tomato-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="24" cy="28" rx="18" ry="18" fill="url(#tomato-grad)"/>
+    <path d="M24 10c-3 0-6 1.6-8 4M24 10c3 0 6 1.6 8 4M24 10V4" stroke="#4c7a38" stroke-width="2.5" stroke-linecap="round"/>
+    <defs>
+      <radialGradient id="tomato-grad" cx="0.4" cy="0.35" r="0.6">
+        <stop offset="0%" stop-color="#e07050"/>
+        <stop offset="100%" stop-color="#a04828"/>
+      </radialGradient>
+    </defs>
+  </svg>
+  <div class="title">پامادور</div>
+</body>
+</html>

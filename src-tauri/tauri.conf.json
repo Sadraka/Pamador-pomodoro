@@ -12,6 +12,7 @@
   "app": {
     "windows": [
       {
+        "label": "main",
         "title": "پامادور",
         "width": 448,
         "height": 580,
@@ -19,7 +20,18 @@
         "minHeight": 480,
         "resizable": true,
         "fullscreen": false,
-        "visible": true
+        "visible": false
+      },
+      {
+        "label": "splashscreen",
+        "title": "پامادور",
+        "url": "splash.html",
+        "width": 300,
+        "height": 300,
+        "resizable": false,
+        "decorations": false,
+        "center": true,
+        "alwaysOnTop": true
       }
     ],
     "security": {
