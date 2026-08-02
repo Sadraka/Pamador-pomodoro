@@ -13,6 +13,7 @@ export function usePomodoro() {
   useEffect(() => {
     let disposed = false;
 
+    // Close the splash screen once React is mounted; reveal the main window.
     if ('__TAURI_INTERNALS__' in window) {
       invoke('close_splashscreen').catch(console.error);
     }

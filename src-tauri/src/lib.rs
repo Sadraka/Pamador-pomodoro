@@ -31,6 +31,8 @@ fn spawn_ticker(app: tauri::AppHandle, state: timer::SharedState) {
     });
 }
 
+/// Called from the frontend once React is ready: closes the splash screen
+/// and reveals the main window.
 #[tauri::command]
 fn close_splashscreen(app: tauri::AppHandle) {
     if let Some(splashscreen) = app.get_webview_window("splashscreen") {
@@ -56,7 +58,13 @@ pub fn run() {
             }
 
             // Settings live in <app_data_dir>/settings.json so choices survive restarts.
-            let app_data_dir = app.path().app_data_dir().ok();
+            let app_data_dir = match app.path().app_data_dir() {
+                Ok(dir) => Some(dir),
+                Err(e) => {
+                    log::error!("failed to resolve app_data_dir; settings persistence disabled: {e}");
+                    None
+                }
+            };
             let state: timer::SharedState =
                 Arc::new(Mutex::new(timer::TimerState::new_with_save_dir(app_data_dir.as_deref())));
             app.manage(state.clone());

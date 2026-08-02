@@ -102,6 +102,9 @@ impl TimerState {
     fn save_settings(&self) {
         if let Some(path) = &self.save_path {
             let json = serde_json::to_string_pretty(&self.settings).unwrap_or_default();
+            if let Some(parent) = path.parent() {
+                let _ = std::fs::create_dir_all(parent);
+            }
             let _ = std::fs::write(path, json);
         }
     }
@@ -411,6 +414,34 @@ mod tests {
         assert!(!t2.snapshot().settings.raise_on_finish);
         // Remaining seconds follow the persisted duration.
         assert_eq!(t2.snapshot().remaining_secs, 42 * 60);
+
+        std::fs::remove_dir_all(&dir).ok();
+    }
+
+    #[test]
+    fn save_settings_creates_missing_parent_dir() {
+        use std::sync::atomic::{AtomicU64, Ordering};
+        static COUNTER: AtomicU64 = AtomicU64::new(0);
+        let n = COUNTER.fetch_add(1, Ordering::Relaxed);
+        // Deliberately do NOT create the dir: this is the clean-install case.
+        let dir = std::env::temp_dir().join(format!("pamador-test-nodir-{}", n));
+
+        let mut t = TimerState::new_with_save_dir(Some(&dir));
+        let s = Settings {
+            focus_secs: 42 * 60,
+            short_break_secs: 7 * 60,
+            long_break_secs: 20 * 60,
+            sound_path: Some("C:/custom.mp3".into()),
+            raise_on_finish: false,
+        };
+        t.update_settings(s);
+
+        assert!(
+            dir.join(SETTINGS_FILE).exists(),
+            "settings.json should be written after creating the parent dir"
+        );
+        let json = std::fs::read_to_string(dir.join(SETTINGS_FILE)).unwrap();
+        assert!(json.contains("42"));
 
         std::fs::remove_dir_all(&dir).ok();
     }

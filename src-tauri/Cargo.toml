@@ -24,3 +24,10 @@ log = "0.4"
 tauri = { version = "2.11.3", features = ["protocol-asset"] }
 tauri-plugin-log = "2"
 tauri-plugin-dialog = "2"
+
+# Smaller, faster release binary.
+# Note: no panic = "abort" — Tauri/WebView2 on Windows relies on unwind.
+[profile.release]
+lto = true
+strip = true
+codegen-units = 1
