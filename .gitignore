@@ -7,10 +7,21 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Dependencies & build output
 node_modules
 dist
 dist-ssr
+
+# Local env / credentials
+.env
+.env.*
+!.env.example
 *.local
+
+# Local tooling / agent artifacts
+.agents/
+.hallmark/
+skills-lock.json
 
 # Editor directories and files
 .vscode/*
@@ -22,3 +33,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# OS
+Thumbs.db
