@@ -1,32 +1,119 @@
-# React + TypeScript + Vite
+# پامادور 🍅
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+**پامادور** یک تایمر پومودورو برای دسکتاپ است — ساخته‌شده با **Tauri 2** و **React**.
 
-Currently, two official plugins are available:
+## امکانات تایمر پومودورو پامادور
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- سه حالت تایمر: تمرکز، استراحت کوتاه، استراحت بلند
+- تنظیم زمان تمرکز از ۱ تا ۹۹ دقیقه یا انتخاب از پیشنهادهای سریع
+- صدای سفارشی برای آلارم (فایل صوتی دلخواه یا صدای پیش‌فرض)
+- ذخیرهٔ خودکار تنظیمات — هر چیزی که بچینید، بعد از بستن برنامه حفظ می‌شود
+- دوزبانه: فارسی و انگلیسی
+- در صورت پایان تایمر، پنجره از حالت کوچک‌شده برمی‌گردد (قابل تنظیم)
 
-## React Compiler
+## تکنولوژی‌ها
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+| لایه | فناوری |
+|------|--------|
+| رابط کاربری | React 19 + TypeScript |
+| ظاهر | CSS اختصاصی، فونت وزیرمتن |
+| بدنه | Rust (Tauri 2) |
+| ساخت | Vite |
 
-## Expanding the Oxlint configuration
+## اجرا و بیلد
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+پیش‌نیاز: [Node.js](https://nodejs.org) و [Rust](https://rustup.rs).
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```bash
+npm install
+
+# حالت توسعه — تغییرات به‌صورت خودکار اعمال می‌شود
+npm run tauri dev
+
+# بیلد نهایی
+npm run build
+npx tauri build --no-bundle
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+خروجی: `src-tauri/target/release/pamador.exe`
+
+## ساختار پروژه
+
+```
+src/                  # فرانت (React)
+  components/         # اجزای رابط کاربری
+  hooks/              # منطق اتصال به Rust و پخش صدا
+  i18n/               # ترجمهٔ فارسی و انگلیسی
+src-tauri/
+  src/timer.rs        # منطق تایمر و ذخیرهٔ تنظیمات
+  src/lib.rs          # پنجره‌ها و رویدادها
+```
+
+## تایمر پامادور چطور کار می‌کند؟
+
+منطق تایمر در Rust اجرا می‌شود، نه جاوااسکریپت. یک نخ پس‌زمینه هر ثانیه وضعیت را بررسی و از طریق رویداد به فرانت اطلاع می‌دهد؛ به همین دلیل تایمر حتی در شرایط سنگین هم دقیق است.
+
+## مجوز
+
+آزاد — بدون مجوز مشخص.
+
+---
+
+# Pamador 🍅
+
+**Pamador** is a Pomodoro timer for the desktop — built with **Tauri 2** and **React**.
+
+## Pamador Pomodoro Timer Features
+
+- Three timer modes: Focus, Short Break, Long Break
+- Set focus duration from 1 to 99 minutes, or pick a quick preset
+- Custom alarm sound (your own audio file, or the built-in default)
+- Settings persist automatically — your choices are kept between launches
+- Bilingual: Persian and English
+- When the timer finishes, the window restores itself if minimized (toggleable)
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| UI | React 19 + TypeScript |
+| Styling | Hand-written CSS, Vazirmatn font |
+| Backend | Rust (Tauri 2) |
+| Build | Vite |
+
+## Run & Build
+
+Prerequisites: [Node.js](https://nodejs.org) and [Rust](https://rustup.rs).
+
+```bash
+npm install
+
+# Development mode — changes apply automatically
+npm run tauri dev
+
+# Production build
+npm run build
+npx tauri build --no-bundle
+```
+
+Output: `src-tauri/target/release/pamador.exe`
+
+## Project Structure
+
+```
+src/                  # Frontend (React)
+  components/         # UI components
+  hooks/              # Rust bridge & audio playback logic
+  i18n/               # Persian / English translations
+src-tauri/
+  src/timer.rs        # Timer logic and settings persistence
+  src/lib.rs          # Windows and events
+```
+
+## How the Pamador Timer Works
+
+The timer logic runs in Rust, not JavaScript. A background thread checks the state every second and notifies the frontend via events; that's why the timer stays accurate even under heavy load.
+
+## License
+
+Free to use — no specific license.
