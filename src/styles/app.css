@@ -231,11 +231,11 @@
 
 /* dial state: scale the whole ring down instead of changing width */
 .ring--dial {
-  transform: scale(0.55);
+  transform: scale(0.95);
 }
 
 .ring--dial .ring__time {
-  font-size: clamp(1.5rem, 8vmin, 2.5rem);
+  font-size: clamp(1.8rem, 10vmin, 3rem);
 }
 
 .ring__svg {
@@ -526,6 +526,23 @@
   font-weight: 800;
   font-variant-numeric: tabular-nums;
   color: var(--color-ink);
+  border: none;
+  background: transparent;
+  padding: 0;
+  outline: none;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.dial__value::-webkit-outer-spin-button,
+.dial__value::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.dial__value:focus {
+  background: var(--glass-bg-active);
+  border-radius: var(--radius-sm);
 }
 
 .chips--presets {

@@ -33,6 +33,6 @@ skills-lock.json
 *.njsproj
 *.sln
 *.sw?
-
+.claude
 # OS
 Thumbs.db

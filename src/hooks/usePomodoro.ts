@@ -14,9 +14,12 @@ export function usePomodoro() {
     let disposed = false;
 
     // Close the splash screen once React is mounted; reveal the main window.
-    if ('__TAURI_INTERNALS__' in window) {
-      invoke('close_splashscreen').catch(console.error);
-    }
+    // A short timeout guarantees the webview is ready before we dismiss it.
+    const closeTimer = window.setTimeout(() => {
+      if ('__TAURI_INTERNALS__' in window) {
+        invoke('close_splashscreen').catch(console.error);
+      }
+    }, 150);
 
     invoke<Snapshot>('get_state')
       .then((s) => {
@@ -27,6 +30,7 @@ export function usePomodoro() {
     const unFinished = listen<Finished>(FINISHED_EVENT, (e) => setLastFinished(e.payload));
     return () => {
       disposed = true;
+      window.clearTimeout(closeTimer);
       unTimer.then((fn) => fn());
       unFinished.then((fn) => fn());
     };
