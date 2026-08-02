@@ -59,7 +59,7 @@ src-tauri/
 
 ## How the Pamador Timer Works
 
-The timer logic runs in Rust, not JavaScript. A background thread checks the state every second and notifies the frontend via events; that's why the timer stays accurate even under heavy load.
+The timer logic runs in Rust, not JavaScript. A background thread checks the state every second and notifies the frontend via events.
 
 ## License
 
