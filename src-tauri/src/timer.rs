@@ -10,7 +10,6 @@ use tauri::State;
 pub enum Mode {
     Focus,
     ShortBreak,
-    LongBreak,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Serialize)]
@@ -26,7 +25,6 @@ pub enum Status {
 pub struct Settings {
     pub focus_secs: u64,
     pub short_break_secs: u64,
-    pub long_break_secs: u64,
     /// None = default bundled alarm; Some(path) = user-chosen .mp3/.wav
     pub sound_path: Option<String>,
     /// When true, restore/raise the window when the timer finishes.
@@ -38,7 +36,6 @@ impl Default for Settings {
         Self {
             focus_secs: 25 * 60,
             short_break_secs: 5 * 60,
-            long_break_secs: 15 * 60,
             sound_path: None,
             raise_on_finish: true,
         }
@@ -144,22 +141,17 @@ impl TimerState {
         match mode {
             Mode::Focus => self.settings.focus_secs,
             Mode::ShortBreak => self.settings.short_break_secs,
-            Mode::LongBreak => self.settings.long_break_secs,
         }
     }
 
-    /// Advance to the next mode; every 4th finished focus is a long break.
+    /// Advance to the next mode (focus → short break → focus).
     fn advance(&mut self) {
         self.mode = match self.mode {
             Mode::Focus => {
                 self.focus_count += 1;
-                if self.focus_count % 4 == 0 {
-                    Mode::LongBreak
-                } else {
-                    Mode::ShortBreak
-                }
+                Mode::ShortBreak
             }
-            Mode::ShortBreak | Mode::LongBreak => Mode::Focus,
+            Mode::ShortBreak => Mode::Focus,
         };
     }
 
@@ -298,7 +290,6 @@ mod tests {
         Settings {
             focus_secs: 3,
             short_break_secs: 2,
-            long_break_secs: 2,
             sound_path: Some("C:/alarm.mp3".into()),
             raise_on_finish: true,
         }
@@ -355,26 +346,13 @@ mod tests {
     }
 
     #[test]
-    fn every_fourth_focus_is_long_break() {
-        let mut t = TimerState::default();
-        t.update_settings(fast_settings());
-        t.focus_count = 3;
-        t.start();
-        std::thread::sleep(Duration::from_millis(3500));
-        let f = t.tick().expect("finish");
-        assert_eq!(f.mode, Mode::Focus);
-        assert_eq!(t.snapshot().mode, Mode::LongBreak);
-        assert_eq!(t.snapshot().focus_count, 4);
-    }
-
-    #[test]
     fn set_mode_switches_and_stops() {
         let mut t = TimerState::default();
         t.start();
-        let s = t.set_mode(Mode::LongBreak);
-        assert_eq!(s.mode, Mode::LongBreak);
+        let s = t.set_mode(Mode::ShortBreak);
+        assert_eq!(s.mode, Mode::ShortBreak);
         assert_eq!(s.status, Status::Idle);
-        assert_eq!(s.remaining_secs, 15 * 60);
+        assert_eq!(s.remaining_secs, 5 * 60);
         assert!(!t.is_running());
         assert_eq!(t.set_mode(Mode::Focus).remaining_secs, 25 * 60);
     }
@@ -396,7 +374,6 @@ mod tests {
         let s = Settings {
             focus_secs: 42 * 60,
             short_break_secs: 7 * 60,
-            long_break_secs: 20 * 60,
             sound_path: Some("C:/custom.mp3".into()),
             raise_on_finish: false,
         };
@@ -406,7 +383,6 @@ mod tests {
         let t2 = TimerState::new_with_save_dir(Some(&dir_path));
         assert_eq!(t2.snapshot().settings.focus_secs, 42 * 60);
         assert_eq!(t2.snapshot().settings.short_break_secs, 7 * 60);
-        assert_eq!(t2.snapshot().settings.long_break_secs, 20 * 60);
         assert_eq!(
             t2.snapshot().settings.sound_path.as_deref(),
             Some("C:/custom.mp3")
@@ -430,7 +406,6 @@ mod tests {
         let s = Settings {
             focus_secs: 42 * 60,
             short_break_secs: 7 * 60,
-            long_break_secs: 20 * 60,
             sound_path: Some("C:/custom.mp3".into()),
             raise_on_finish: false,
         };
@@ -455,7 +430,6 @@ mod tests {
         let s = t.update_settings(Settings {
             focus_secs: 999,
             short_break_secs: 2,
-            long_break_secs: 2,
             sound_path: None,
             raise_on_finish: false,
         });

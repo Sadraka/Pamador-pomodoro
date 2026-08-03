@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import type { TKey } from '../i18n/messages';
 import { useI18n } from '../i18n/LanguageContext';
 import { toFaDigits } from '../utils/format';
 
@@ -13,9 +14,11 @@ interface FocusDialProps {
   value: number; // seconds
   onChange: (secs: number) => void;
   visible: boolean;
+  /** i18n key for the accessible label, e.g. 'focusDuration' or 'shortBreakDuration'. */
+  labelKey?: TKey;
 }
 
-export default function FocusDial({ value, onChange, visible }: FocusDialProps) {
+export default function FocusDial({ value, onChange, visible, labelKey = 'focusDuration' }: FocusDialProps) {
   const { lang, t } = useI18n();
 
   const minutes = Math.floor(value / 60);
@@ -88,7 +91,7 @@ export default function FocusDial({ value, onChange, visible }: FocusDialProps) 
     <div
       className={`focus-dial${visible ? '' : ' focus-dial--hidden'}`}
       role="group"
-      aria-label={t('focusDuration')}
+      aria-label={t(labelKey)}
       aria-hidden={!visible}
     >
       <div className="dial__row">
@@ -147,7 +150,7 @@ export default function FocusDial({ value, onChange, visible }: FocusDialProps) 
         </div>
         <span className="dial__label">{t('minutes')}</span>
       </div>
-      <div className="chips chips--presets" role="group" aria-label={t('focusDuration')}>
+      <div className="chips chips--presets" role="group" aria-label={t(labelKey)}>
         {PRESETS.map((m) => (
           <button
             key={m}

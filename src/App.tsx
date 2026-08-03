@@ -7,30 +7,38 @@ import FocusDial from './components/FocusDial';
 import SoundSettingsModal from './components/SoundSettingsModal';
 import { usePomodoro } from './hooks/usePomodoro';
 import { useAlarm } from './hooks/useAlarm';
-import type { Settings } from './types/timer';
+import type { Mode, Settings } from './types/timer';
 
 export default function App() {
   const { snapshot, lastFinished, start, pause, reset, skip, setMode, updateSettings } =
     usePomodoro();
-  const [focusCustom, setFocusCustom] = useState<number | null>(null);
+  // Pending custom duration per mode (null = keep the saved setting).
+  const [dial, setDial] = useState<Record<Mode, number | null>>({ focus: null, shortBreak: null });
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [showFocusDial, setShowFocusDial] = useState(false);
+  const [showDial, setShowDial] = useState<Mode | null>(null);
 
   // Rust-side pomodoro alarm (plays on `timer-finished`).
   useAlarm(lastFinished);
 
   const activeMode = snapshot?.mode ?? 'focus';
   const status = snapshot?.status ?? 'idle';
-  const dialValue = focusCustom ?? snapshot?.settings.focusSecs ?? 25 * 60;
   const isIdle = status === 'idle';
-  const showDial = activeMode === 'focus' && isIdle && showFocusDial;
+  const dialVisible = isIdle && showDial === activeMode;
+
+  const settingKey = activeMode === 'focus' ? 'focusSecs' : 'shortBreakSecs';
+  const fallback = activeMode === 'focus' ? 25 * 60 : 5 * 60;
+  const dialValue = dial[activeMode] ?? snapshot?.settings[settingKey] ?? fallback;
 
   const handleStart = async () => {
-    if (focusCustom !== null && snapshot) {
-      await updateSettings({ ...snapshot.settings, focusSecs: focusCustom });
-      setFocusCustom(null);
+    if (snapshot && dial[activeMode] !== null) {
+      if (activeMode === 'focus') {
+        await updateSettings({ ...snapshot.settings, focusSecs: dial.focus ?? snapshot.settings.focusSecs });
+      } else {
+        await updateSettings({ ...snapshot.settings, shortBreakSecs: dial.shortBreak ?? snapshot.settings.shortBreakSecs });
+      }
+      setDial((d) => ({ ...d, [activeMode]: null }));
     }
-    setShowFocusDial(false);
+    setShowDial(null);
     void start();
   };
 
@@ -39,9 +47,9 @@ export default function App() {
     await updateSettings({ ...snapshot.settings, ...partial });
   };
 
-  const handleOpenFocusDial = () => {
-    if (isIdle && activeMode === 'focus') {
-      setShowFocusDial(true);
+  const handleOpenDial = (mode: Mode) => {
+    if (isIdle && (mode === 'focus' || mode === 'shortBreak')) {
+      setShowDial(mode);
     }
   };
 
@@ -52,12 +60,17 @@ export default function App() {
       <main className="app__body">
         <TimerRing
           snapshot={snapshot}
-          displaySecs={showDial ? dialValue : undefined}
-          dial={showDial}
-          showGear={isIdle && activeMode === 'focus' && !showDial}
-          onGearClick={handleOpenFocusDial}
+          displaySecs={dialVisible ? dialValue : undefined}
+          dial={dialVisible}
+          showGear={isIdle && (activeMode === 'focus' || activeMode === 'shortBreak') && !dialVisible}
+          onGearClick={() => handleOpenDial(activeMode)}
         />
-        <FocusDial value={dialValue} onChange={setFocusCustom} visible={showDial} />
+        <FocusDial
+          value={dialValue}
+          labelKey={activeMode === 'focus' ? 'focusDuration' : 'shortBreakDuration'}
+          onChange={(secs) => setDial((d) => ({ ...d, [activeMode]: secs }))}
+          visible={dialVisible}
+        />
         <Controls
           snapshot={snapshot}
           onStart={handleStart}

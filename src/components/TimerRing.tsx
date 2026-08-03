@@ -7,8 +7,7 @@ const CIRC = 2 * Math.PI * R;
 
 function totalSecs(s: Snapshot): number {
   if (s.mode === 'focus') return s.settings.focusSecs;
-  if (s.mode === 'shortBreak') return s.settings.shortBreakSecs;
-  return s.settings.longBreakSecs;
+  return s.settings.shortBreakSecs;
 }
 
 export default function TimerRing({

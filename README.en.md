@@ -12,7 +12,7 @@
 
 ## Pamador Pomodoro Timer Features
 
-- Three timer modes: Focus, Short Break, Long Break
+- Two timer modes: Focus and Short Break
 - Set focus duration from 1 to 99 minutes, or pick a quick preset
 - Custom alarm sound (your own audio file, or the built-in default)
 - Settings persist automatically — your choices are kept between launches

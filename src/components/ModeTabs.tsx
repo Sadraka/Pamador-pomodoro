@@ -1,7 +1,7 @@
 import type { Mode } from '../types/timer';
 import { useI18n } from '../i18n/LanguageContext';
 
-const MODES: Mode[] = ['focus', 'shortBreak', 'longBreak'];
+const MODES: Mode[] = ['focus', 'shortBreak'];
 
 export default function ModeTabs({ mode, onSelect }: { mode: Mode; onSelect: (m: Mode) => void }) {
   const { t } = useI18n();
