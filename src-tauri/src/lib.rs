@@ -3,7 +3,11 @@ mod timer;
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
-use tauri::{Emitter, Manager};
+use tauri::{
+    menu::{Menu, MenuItem},
+    tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
+    AppHandle, Emitter, Manager,
+};
 
 fn spawn_ticker(app: tauri::AppHandle, state: timer::SharedState) {
     std::thread::spawn(move || loop {
@@ -31,6 +35,53 @@ fn spawn_ticker(app: tauri::AppHandle, state: timer::SharedState) {
     });
 }
 
+fn show_main_window(app: &AppHandle) {
+    if let Some(window) = app.get_webview_window("main") {
+        let _ = window.unminimize();
+        let _ = window.show();
+        let _ = window.set_focus();
+    }
+}
+
+/// System tray: left-click toggles the window, right-click menu lets the
+/// user show/hide or fully quit.
+fn build_tray(app: &AppHandle) -> tauri::Result<()> {
+    let show_item = MenuItem::with_id(app, "show", "نمایش/مخفی‌کردن", true, None::<&str>)?;
+    let quit_item = MenuItem::with_id(app, "quit", "خروج", true, None::<&str>)?;
+    let menu = Menu::with_items(app, &[&show_item, &quit_item])?;
+
+    TrayIconBuilder::with_id("main-tray")
+        .icon(app.default_window_icon().cloned().expect("window icon missing"))
+        .tooltip("پامادور")
+        .menu(&menu)
+        .show_menu_on_left_click(false)
+        .on_menu_event(|app, event| match event.id.as_ref() {
+            "show" => {
+                if let Some(w) = app.get_webview_window("main") {
+                    if w.is_visible().unwrap_or(false) {
+                        let _ = w.hide();
+                    } else {
+                        show_main_window(app);
+                    }
+                }
+            }
+            "quit" => app.exit(0),
+            _ => {}
+        })
+        .on_tray_icon_event(|tray, event| {
+            if let TrayIconEvent::Click {
+                button: MouseButton::Left,
+                button_state: MouseButtonState::Up,
+                ..
+            } = event
+            {
+                show_main_window(tray.app_handle());
+            }
+        })
+        .build(app)?;
+    Ok(())
+}
+
 /// Called from the frontend once React is ready: closes the splash screen
 /// and reveals the main window.
 #[tauri::command]
@@ -47,7 +98,32 @@ fn close_splashscreen(app: tauri::AppHandle) {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
+            // A second instance was launched: reveal the existing main window.
+            if let Some(window) = app.get_webview_window("main") {
+                let _ = window.unminimize();
+                let _ = window.show();
+                let _ = window.set_focus();
+            }
+        }))
         .plugin(tauri_plugin_dialog::init())
+        .on_window_event(|window, event| {
+            if window.label() != "main" {
+                return;
+            }
+            match event {
+                tauri::WindowEvent::CloseRequested { api, .. } => {
+                    let _ = window.hide();
+                    api.prevent_close();
+                }
+                tauri::WindowEvent::Resized(_) => {
+                    if window.is_minimized().unwrap_or(false) {
+                        let _ = window.hide();
+                    }
+                }
+                _ => {}
+            }
+        })
         .setup(|app| {
             if cfg!(debug_assertions) {
                 app.handle().plugin(
@@ -69,6 +145,7 @@ pub fn run() {
                 Arc::new(Mutex::new(timer::TimerState::new_with_save_dir(app_data_dir.as_deref())));
             app.manage(state.clone());
             spawn_ticker(app.handle().clone(), state);
+            let _ = build_tray(app.handle());
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
