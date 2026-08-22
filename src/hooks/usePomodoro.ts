@@ -1,10 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
-import { invoke } from '@tauri-apps/api/core';
-import { listen } from '@tauri-apps/api/event';
+import { getBackend } from '../platform';
 import type { Finished, Mode, Settings, Snapshot } from '../types/timer';
-
-const TIMER_EVENT = 'timer';
-const FINISHED_EVENT = 'timer-finished';
 
 export function usePomodoro() {
   const [snapshot, setSnapshot] = useState<Snapshot | null>(null);
@@ -13,49 +9,48 @@ export function usePomodoro() {
   useEffect(() => {
     let disposed = false;
 
-    // Close the splash screen once React is mounted; reveal the main window.
+    // Desktop only: close the splash screen once React is mounted.
     // A short timeout guarantees the webview is ready before we dismiss it.
     const closeTimer = window.setTimeout(() => {
-      if ('__TAURI_INTERNALS__' in window) {
-        invoke('close_splashscreen').catch(console.error);
-      }
+      getBackend().closeSplashscreen?.();
     }, 150);
 
-    invoke<Snapshot>('get_state')
+    getBackend()
+      .getSnapshot()
       .then((s) => {
         if (!disposed) setSnapshot(s);
       })
       .catch(console.error);
-    const unTimer = listen<Snapshot>(TIMER_EVENT, (e) => setSnapshot(e.payload));
-    const unFinished = listen<Finished>(FINISHED_EVENT, (e) => setLastFinished(e.payload));
+    const unTimer = getBackend().onTimer((s) => setSnapshot(s));
+    const unFinished = getBackend().onFinished((f) => setLastFinished(f));
     return () => {
       disposed = true;
       window.clearTimeout(closeTimer);
-      unTimer.then((fn) => fn());
-      unFinished.then((fn) => fn());
+      unTimer();
+      unFinished();
     };
   }, []);
 
-  const run = useCallback(async (cmd: string, args?: Record<string, unknown>) => {
-    const s = await invoke<Snapshot>(cmd, args);
-    setSnapshot(s);
-    return s;
-  }, []);
+  const run = useCallback(
+    async (action: (b: ReturnType<typeof getBackend>) => Promise<Snapshot>) => {
+      setSnapshot(await action(getBackend()));
+    },
+    [],
+  );
 
-  const start = useCallback(() => run('start_timer'), [run]);
-  const pause = useCallback(() => run('pause_timer'), [run]);
-  const reset = useCallback(() => run('reset_timer'), [run]);
-  const skip = useCallback(() => run('skip_timer'), [run]);
-  const setMode = useCallback((mode: Mode) => run('set_mode', { mode }), [run]);
+  const start = useCallback(() => run((b) => b.start()), [run]);
+  const pause = useCallback(() => run((b) => b.pause()), [run]);
+  const reset = useCallback(() => run((b) => b.reset()), [run]);
+  const skip = useCallback(() => run((b) => b.skip()), [run]);
+  const setMode = useCallback((mode: Mode) => run((b) => b.setMode(mode)), [run]);
   const updateSettings = useCallback(
-    (settings: Settings) => run('update_settings', { settings }),
+    (settings: Settings) => run((b) => b.updateSettings(settings)),
     [run],
   );
 
   return {
     snapshot,
     lastFinished,
-    clearFinished: () => setLastFinished(null),
     start,
     pause,
     reset,

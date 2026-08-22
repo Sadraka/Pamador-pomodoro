@@ -12,6 +12,14 @@ node_modules
 dist
 dist-ssr
 
+# Android (Capacitor) build outputs & local config
+android/.gradle
+android/app/build
+android/build
+android/local.properties
+android/capacitor-cordova-android-plugins
+android/app/src/main/assets/public
+
 # Local env / credentials
 .env
 .env.*

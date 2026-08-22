@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { open } from '@tauri-apps/plugin-dialog';
+import { getBackend } from '../platform';
 import type { Settings, Snapshot } from '../types/timer';
 import { useI18n } from '../i18n/LanguageContext';
 
@@ -17,13 +17,8 @@ export default function SoundSettingsModal({ snapshot, onSave, onClose }: Props)
   const [raise, setRaise] = useState<boolean>(currentRaise);
 
   const chooseFile = async () => {
-    const file = await open({
-      multiple: false,
-      filters: [
-        { name: t('audioFiles'), extensions: ['mp3', 'wav', 'ogg', 'm4a'] },
-      ],
-    });
-    if (typeof file === 'string') setPicked(file);
+    const ref = await getBackend().pickAudioFile();
+    if (ref) setPicked(ref);
   };
 
   const close = () => {
@@ -65,7 +60,9 @@ export default function SoundSettingsModal({ snapshot, onSave, onClose }: Props)
             </button>
           </div>
 
-          {picked && <div className="sound-file">{picked}</div>}
+          {picked && !picked.startsWith('data:') && (
+            <div className="sound-file">{picked}</div>
+          )}
 
           <label className="toggle-row">
             <input

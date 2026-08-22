@@ -1,12 +1,12 @@
 import { useEffect } from 'react';
-import { convertFileSrc } from '@tauri-apps/api/core';
+import { getBackend } from '../platform';
 import type { Finished } from '../types/timer';
 
 let audio: HTMLAudioElement | null = null;
 
-function playFile(path: string) {
+function playSrc(src: string) {
   audio?.pause();
-  audio = new Audio(convertFileSrc(path));
+  audio = new Audio(src);
   void audio.play().catch(console.error);
 }
 
@@ -38,7 +38,7 @@ export function playChime() {
 export function useAlarm(lastFinished: Finished | null) {
   useEffect(() => {
     if (!lastFinished) return;
-    if (lastFinished.soundPath) playFile(lastFinished.soundPath);
+    if (lastFinished.soundPath) playSrc(getBackend().audioSrcFor(lastFinished.soundPath));
     else playChime();
   }, [lastFinished]);
 }
