@@ -45,3 +45,15 @@ body {
 * {
   -webkit-tap-highlight-color: transparent;
 }
+
+/* Samsung/OneUI WebViews still flash the UA button background on press
+   unless the system appearance is dropped entirely. All buttons here
+   draw their own pressed states, so strip the UA skin everywhere. */
+button,
+[role='button'],
+input[type='checkbox'] {
+  -webkit-appearance: none;
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+}
