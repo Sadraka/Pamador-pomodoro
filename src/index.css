@@ -15,6 +15,10 @@ html {
 body {
   overflow: hidden;
   overscroll-behavior: none; /* no bounce/glow on Windows touch */
+  /* No square tap highlight on Android WebView — buttons style themselves */
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  user-select: none; /* it's an app, not a document */
   margin: 0;
   height: 100vh;
   background: var(--color-paper);
