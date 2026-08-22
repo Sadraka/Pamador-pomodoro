@@ -14,8 +14,8 @@
 
 آخرین نسخه از صفحهٔ [Releases](https://github.com/Sadraka/Pamador-pomodoro/releases) قابل دریافت است:
 
-- **ویندوز**: فایل `pamador-x.y.z-windows-x64.exe` — پرتابل، بدون نیاز به نصب
-- **اندروید**: فایل `pamador-x.y.z-android.apk` — نصب مستقیم (اندروید ۷ به بالا)
+- **ویندوز**: فایل `pamador-x.y.z-windows-x64.exe`
+- **اندروید**: فایل `pamador-x.y.z-android.apk` (اندروید ۷ به بالا)
 
 ## امکانات تایمر پومودورو پامادور
 

@@ -14,8 +14,8 @@
 
 Grab the latest build from the [Releases](https://github.com/Sadraka/Pamador-pomodoro/releases) page:
 
-- **Windows**: `pamador-x.y.z-windows-x64.exe` — portable, no installer needed
-- **Android**: `pamador-x.y.z-android.apk` — install directly (Android 7+)
+- **Windows**: `pamador-x.y.z-windows-x64.exe`
+- **Android**: `pamador-x.y.z-android.apk` (Android 7+)
 
 ## Pamador Pomodoro Timer Features
 
