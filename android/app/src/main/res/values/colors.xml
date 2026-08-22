@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- App palette (overrides Capacitor's default blue) -->
+    <color name="colorPrimary">#161e18</color>
+    <color name="colorPrimaryDark">#0f1511</color>
+    <color name="colorAccent">#8ab88a</color>
+</resources>

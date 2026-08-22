@@ -35,3 +35,13 @@ body {
   outline-offset: 2px;
   border-radius: inherit;
 }
+
+/* Android WebView paints a native square focus ring (theme colorPrimary)
+   on tap. Kill every focus/active outline on pointer input; :focus-visible
+   above still covers keyboard navigation. */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+* {
+  -webkit-tap-highlight-color: transparent;
+}
