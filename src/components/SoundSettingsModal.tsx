@@ -57,14 +57,6 @@ export default function SoundSettingsModal({ snapshot, onSave, onClose }: Props)
             </button>
             <button
               type="button"
-              className="btn"
-              onClick={() => setPicked(null)}
-              disabled={!picked}
-            >
-              {t('defaultSound')}
-            </button>
-            <button
-              type="button"
               className="btn btn--ghost"
               onClick={() => setPicked(null)}
               disabled={!picked}

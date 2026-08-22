@@ -38,8 +38,7 @@ npm install
 # حالت توسعه — تغییرات به‌صورت خودکار اعمال می‌شود
 npm run tauri dev
 
-# بیلد نهایی
-npm run build
+# بیلد نهایی — `beforeBuildCommand` خودش فرانت را می‌سازد
 npx tauri build --no-bundle
 ```
 

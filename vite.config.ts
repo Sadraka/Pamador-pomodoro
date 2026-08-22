@@ -8,6 +8,7 @@ export default defineConfig({
   server: {
     host: '127.0.0.1',
     port: 1420,
-    strictPort: false
+    // tauri devUrl is pinned to 1420 — failing beats silently serving on another port
+    strictPort: true
   },
 })

@@ -31,7 +31,8 @@ export default function TimerRing({
 
   const text = formatTime(remaining, lang);
   const paused = snapshot?.status === 'paused';
-  const label = displaySecs ? `${t('focus')} — ${text}` : snapshot ? `${t(snapshot.mode)} — ${text}` : t('focus');
+  const modeKey = snapshot?.mode ?? 'focus';
+  const label = `${t(modeKey)} — ${text}`;
 
   return (
     <div className={`ring${dial ? ' ring--dial' : ''}`} role="timer" aria-label={label}>

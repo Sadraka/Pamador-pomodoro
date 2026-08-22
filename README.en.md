@@ -38,8 +38,7 @@ npm install
 # Development mode — changes apply automatically
 npm run tauri dev
 
-# Production build
-npm run build
+# Production build — beforeBuildCommand builds the frontend itself
 npx tauri build --no-bundle
 ```
 
