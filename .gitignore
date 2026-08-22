@@ -20,6 +20,10 @@ android/local.properties
 android/capacitor-cordova-android-plugins
 android/app/src/main/assets/public
 
+# Release signing secrets — never commit
+android/keystore/
+android/keystore.properties
+
 # Local env / credentials
 .env
 .env.*
