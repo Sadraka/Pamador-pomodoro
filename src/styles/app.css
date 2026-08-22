@@ -804,3 +804,89 @@
     transition-duration: 150ms !important;
   }
 }
+
+/* ---------- mobile — scale everything up on touch screens ----------
+   Phones are held further from the eye and driven with a thumb, so every
+   element gets a larger floor than the desktop clamps allow. Triggered by
+   coarse pointer (touch) rather than width, so narrow desktop windows
+   keep the desktop layout. */
+@media (pointer: coarse) {
+  .app {
+    box-sizing: border-box; /* keep 100dvh inclusive of the new padding */
+    max-width: 30rem;
+    gap: clamp(0.5rem, 1.6vh, 0.9rem);
+    padding-block: clamp(0.4rem, 1.5vh, 0.75rem);
+  }
+
+  /* header + tabs */
+  .app__head {
+    padding-block: var(--space-sm);
+  }
+
+  .app__wordmark {
+    font-size: var(--text-md);
+  }
+
+  .icon-btn {
+    width: 2.75rem;
+    height: 2.75rem;
+    font-size: 1.5rem;
+  }
+
+  .mode-tab {
+    height: 2.75rem;
+    padding-inline: 1.5rem;
+    font-size: 1rem;
+  }
+
+  /* timer ring + digits dominate the screen */
+  .ring {
+    width: min(78vw, 60vmin, 24rem);
+  }
+
+  .ring__time {
+    font-size: clamp(3.4rem, 19vmin, 5rem);
+  }
+
+  .ring--dial .ring__time {
+    font-size: clamp(2.6rem, 15vmin, 3.8rem);
+  }
+
+  .ring__gear {
+    top: calc(50% + clamp(4.25rem, 16vmin, 5.5rem));
+  }
+
+  /* controls — thumb-sized targets */
+  .controls__main {
+    width: clamp(6rem, 22vmin, 7.25rem);
+    height: clamp(6rem, 22vmin, 7.25rem);
+  }
+
+  .controls__ghost {
+    width: 3.25rem;
+    height: 3.25rem;
+  }
+
+  /* customize dial */
+  .step {
+    width: 3.5rem;
+    height: 3.5rem;
+    font-size: 1.9rem;
+  }
+
+  .dial__value {
+    font-size: 1.6rem;
+    height: 3.5rem;
+  }
+
+  .chips--presets {
+    grid-template-columns: repeat(4, minmax(4rem, 5.25rem));
+    gap: var(--space-xs);
+  }
+
+  .chip {
+    height: 3rem;
+    font-size: 1.15rem;
+  }
+}
+
