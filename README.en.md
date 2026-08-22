@@ -4,11 +4,18 @@
   <a href="README.md">فارسی</a>
 </p>
 
-**Pamador** is a Pomodoro timer for the desktop — built with **Tauri 2** and **React**.
+**Pamador** is a Pomodoro timer for desktop and Android — built with **Tauri 2**, **Capacitor** and **React**.
 
 <p align="center">
   <img src="docs/en.png" alt="Pamador app screenshot" width="320">
 </p>
+
+## Download
+
+Grab the latest build from the [Releases](https://github.com/Sadraka/Pamador-pomodoro/releases) page:
+
+- **Windows**: `pamador-x.y.z-windows-x64.exe` — portable, no installer needed
+- **Android**: `pamador-x.y.z-android.apk` — install directly (Android 7+)
 
 ## Pamador Pomodoro Timer Features
 
@@ -18,6 +25,7 @@
 - Settings persist automatically — your choices are kept between launches
 - Bilingual: Persian and English
 - When the timer finishes, the window restores itself if minimized (toggleable)
+- Hides to the system tray; closing the window doesn't stop the timer
 
 ## Tech Stack
 
@@ -25,40 +33,58 @@
 |-------|-----------|
 | UI | React 19 + TypeScript |
 | Styling | Hand-written CSS, Vazirmatn font |
-| Backend | Rust (Tauri 2) |
+| Desktop backend | Rust (Tauri 2) |
+| Android backend | Capacitor |
 | Build | Vite |
 
 ## Run & Build
 
-Prerequisites: [Node.js](https://nodejs.org) and [Rust](https://rustup.rs).
+Prerequisites: [Node.js](https://nodejs.org), [Rust](https://rustup.rs), and [Android Studio](https://developer.android.com/studio) for the Android build.
 
 ```bash
 npm install
 
-# Development mode — changes apply automatically
+# Desktop dev mode — changes apply automatically
 npm run tauri dev
 
-# Production build — beforeBuildCommand builds the frontend itself
+# Production desktop build — beforeBuildCommand builds the frontend itself
 npx tauri build --no-bundle
 ```
 
 Output: `src-tauri/target/release/pamador.exe`
 
+### Android
+
+```bash
+# Build the web assets and sync them into the Android project
+npm run cap:sync
+
+# Run on a connected device/emulator
+npm run cap:run
+
+# Or open the project in Android Studio
+npm run cap:android
+```
+
+Release builds are signed via `assembleRelease`; signing credentials are read from `android/keystore.properties` (not committed).
+
 ## Project Structure
 
 ```
-src/                  # Frontend (React)
+src/                  # Shared frontend (React)
   components/         # UI components
-  hooks/              # Rust bridge & audio playback logic
+  hooks/              # Backend bridge & audio playback logic
   i18n/               # Persian / English translations
+  platform/           # Platform abstraction: Tauri / JS timer engine
 src-tauri/
-  src/timer.rs        # Timer logic and settings persistence
-  src/lib.rs          # Windows and events
+  src/timer.rs        # Timer logic and settings persistence (desktop)
+  src/lib.rs          # Windows, tray and events
+android/              # Capacitor Android project
 ```
 
 ## How the Pamador Timer Works
 
-The timer logic runs in Rust, not JavaScript. A background thread checks the state every second and notifies the frontend via events.
+On desktop, the timer logic runs in Rust, not JavaScript. A background thread checks the state every second and notifies the frontend via events. On Android the same behavior is reproduced by a TypeScript port of that logic — both use an absolute deadline so counting stays accurate even if the system stalls.
 
 ## License
 
