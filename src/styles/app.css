@@ -839,21 +839,25 @@
     font-size: 1rem;
   }
 
-  /* timer ring + digits dominate the screen */
+  /* timer ring + digits dominate the screen.
+     Digit font is capped relative to the actual ring width so "25:00"
+     never paints past the circle's inner edge. */
   .ring {
-    width: min(78vw, 60vmin, 24rem);
+    --ring-w: min(78vw, 60vmin, 24rem);
+    width: var(--ring-w);
   }
 
   .ring__time {
-    font-size: clamp(3.4rem, 19vmin, 5rem);
+    /* ring inner usable width ≈ ring * 0.72; digits ≈ chars*0.62em wide */
+    font-size: clamp(2.6rem, calc((var(--ring-w) * 0.72 / 5 / 0.62)), 4.2rem);
   }
 
   .ring--dial .ring__time {
-    font-size: clamp(2.6rem, 15vmin, 3.8rem);
+    font-size: clamp(2rem, calc((var(--ring-w) * 0.72 / 5 / 0.62)), 3.2rem);
   }
 
   .ring__gear {
-    top: calc(50% + clamp(4.25rem, 16vmin, 5.5rem));
+    top: calc(50% + clamp(3.75rem, 15vmin, 5rem));
   }
 
   /* controls — thumb-sized targets */
@@ -867,26 +871,42 @@
     height: 3.25rem;
   }
 
-  /* customize dial */
+  /* customize dial — must never exceed the frame width */
+  .focus-dial {
+    box-sizing: border-box; /* padding stays inside 100% */
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .dial__row,
+  .dial {
+    max-width: 100%;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
   .step {
-    width: 3.5rem;
-    height: 3.5rem;
-    font-size: 1.9rem;
+    width: 2.75rem;
+    height: 2.75rem;
+    font-size: 1.5rem;
   }
 
   .dial__value {
-    font-size: 1.6rem;
-    height: 3.5rem;
+    min-width: 3.25rem;
+    width: 3.25rem; /* fixed: content can't inflate it */
+    font-size: 1.35rem;
+    height: 2.75rem;
   }
 
   .chips--presets {
-    grid-template-columns: repeat(4, minmax(4rem, 5.25rem));
-    gap: var(--space-xs);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    width: 100%;
+    gap: var(--space-2xs);
   }
 
   .chip {
-    height: 3rem;
-    font-size: 1.15rem;
+    height: 2.75rem;
+    font-size: 1.05rem;
   }
 }
 
